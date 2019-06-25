@@ -44,6 +44,8 @@ class FastImagePreloaderListener implements RequestListener<File> {
     public boolean onResourceReady(File file, Object o, Target<File> target, DataSource dataSource, boolean b) {
         // o is whatever was passed to .load() = GlideURL, String, etc.
         Log.d(LOG, "Preload succeeded: " + o.toString());
+        Log.d(LOG, "dataSource: " + dataSource.toString());
+
         this.succeeded++;
         this.dispatchProgress();
         return false;
