@@ -92,7 +92,9 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                         // This image will have an expiration time of max age passed from the params.
                         // re-request periodically (balanced performance, if period is big enough, say a week)
                         requestBuilder = requestBuilder.apply(new RequestOptions()
-                                .signature(new ObjectKey(String.format("%s%s", fastImagePreloaderConfiguration.getNamespace(), maxAgeSignature)))
+                                .signature(new ObjectKey(fastImagePreloaderConfiguration.getNamespace()))
+                                .signature(new ObjectKey(maxAgeSignature))
+                                .signature(new ObjectKey("active"))
                         );
                     }
                     requestBuilder.apply(FastImageViewConverter.getOptions(source))
@@ -104,6 +106,26 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void remove(final ReadableArray sources, Promise promise) {
+        final Activity activity = getCurrentActivity();
+
+        for (int i = 0; i < sources.size(); i++) {
+            final ReadableMap source = sources.getMap(i);
+            final FastImageSource imageSource = FastImageViewConverter.getImageSource(activity, source);
+
+            RequestBuilder requestBuilder = Glide
+                    .with(activity.getApplicationContext())
+                    .downloadOnly()
+                    .load(
+                            imageSource.isBase64Resource() ? imageSource.getSource() :
+                                    imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl()
+                    );
+
+
+            requestBuilder.apply(new RequestOptions()
+                    .signature(new ObjectKey("inactive"))
+            ).apply(FastImageViewConverter.getOptions(source))
+                    .preload();
+        }
         promise.resolve("Removing images from cache by sourse is not supported on Android.");
     }
 }
