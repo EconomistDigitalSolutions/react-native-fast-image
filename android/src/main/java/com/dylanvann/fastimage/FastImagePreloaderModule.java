@@ -17,11 +17,16 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.util.Log;
+
 class FastImagePreloaderModule extends ReactContextBaseJavaModule {
 
     private static final String REACT_CLASS = "FastImagePreloaderManager";
     private int preloaders = 0;
     private Map<Integer, FastImagePreloaderConfiguration> fastImagePreloaders = new HashMap<>();
+
+    private static final String LOG = "[FFFastImage]";
+
 
     FastImagePreloaderModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -111,20 +116,14 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
         for (int i = 0; i < sources.size(); i++) {
             final ReadableMap source = sources.getMap(i);
             final FastImageSource imageSource = FastImageViewConverter.getImageSource(activity, source);
-
-            RequestBuilder requestBuilder = Glide
-                    .with(activity.getApplicationContext())
-                    .downloadOnly()
-                    .load(
-                            imageSource.isBase64Resource() ? imageSource.getSource() :
-                                    imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl()
-                    );
-
-
-            requestBuilder.apply(new RequestOptions()
-                    .signature(new ObjectKey("inactive"))
-            ).apply(FastImageViewConverter.getOptions(source))
-                    .preload();
+            try {
+                Glide.with(activity.getApplicationContext()).downloadOnly()
+                        .load(imageSource.isBase64Resource() ? imageSource.getSource()
+                                : imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl())
+                        .submit().get().delete();
+            } catch (Exception e) {
+                Log.d(LOG, e.getMessage());
+            }
         }
         promise.resolve("Removing images from cache by sourse is not supported on Android.");
     }
