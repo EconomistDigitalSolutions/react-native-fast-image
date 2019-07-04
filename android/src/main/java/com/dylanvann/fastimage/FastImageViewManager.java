@@ -37,7 +37,6 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     private static final String REACT_ON_LOAD_START_EVENT = "onFastImageLoadStart";
     private static final String REACT_ON_PROGRESS_EVENT = "onFastImageProgress";
     private static final Map<String, List<FastImageViewWithUrl>> VIEWS_FOR_URLS = new WeakHashMap<>();
-    private static final String LOG = "[FFFastImage]";
 
     @Nullable
     private RequestManager requestManager = null;
@@ -204,12 +203,5 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
             return activity.isFinishing() || activity.isChangingConfigurations();
         }
 
-    }
-
-    @ReactMethod
-    public void addReadOnlyCachePath(String path, Promise promise) {
-        Log.d(LOG, "addReadOnlyCachePath");
-
-        promise.resolve(1);
     }
 }
