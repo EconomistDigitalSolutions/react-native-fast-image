@@ -12,7 +12,6 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +72,8 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                 for (int i = 0; i < sources.size(); i++) {
                     final ReadableMap source = sources.getMap(i);
                     final FastImageSource imageSource = FastImageViewConverter.getImageSource(activity, source);
+                    final Object resource = imageSource.isBase64Resource() ? imageSource.getSource() :
+                            imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl();
 
                     RequestBuilder requestBuilder = Glide
                             .with(activity.getApplicationContext())
@@ -83,11 +84,7 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                             //    - res:/
                             //    - android.resource://
                             //    - data:image/png;base64
-                            .load(
-                                    imageSource.isBase64Resource() ? imageSource.getSource() :
-                                            imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl()
-                            )
-
+                            .load(resource)
                             .listener(preloader);
 
 
@@ -97,9 +94,7 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                         // This image will have an expiration time of max age passed from the params.
                         // re-request periodically (balanced performance, if period is big enough, say a week)
                         requestBuilder = requestBuilder.apply(new RequestOptions()
-                                .signature(new ObjectKey(fastImagePreloaderConfiguration.getNamespace()))
-                                .signature(new ObjectKey(maxAgeSignature))
-                                .signature(new ObjectKey("active"))
+                                .signature(new ObjectKey(String.format("%s%s", fastImagePreloaderConfiguration.getNamespace(), maxAgeSignature)))
                         );
                     }
                     requestBuilder.apply(FastImageViewConverter.getOptions(source))
@@ -120,7 +115,8 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                 Glide.with(activity.getApplicationContext()).downloadOnly()
                         .load(imageSource.isBase64Resource() ? imageSource.getSource()
                                 : imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl())
-                        .submit().get().delete();
+                        .signature(new ObjectKey("inactive"))
+                        .apply();
             } catch (Exception e) {
                 Log.d(LOG, e.getMessage());
             }
