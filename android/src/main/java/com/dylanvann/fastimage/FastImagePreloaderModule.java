@@ -115,8 +115,8 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                 Glide.with(activity.getApplicationContext()).downloadOnly()
                         .load(imageSource.isBase64Resource() ? imageSource.getSource()
                                 : imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl())
-                        .signature(new ObjectKey("inactive"))
-                        .apply();
+                        .apply(new RequestOptions()
+                                .signature(new ObjectKey("inactive"))).submit();
             } catch (Exception e) {
                 Log.d(LOG, e.getMessage());
             }
