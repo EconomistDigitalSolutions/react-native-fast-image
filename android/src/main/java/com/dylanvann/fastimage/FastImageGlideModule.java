@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
 import com.bumptech.glide.module.AppGlideModule;
 
 // We need an AppGlideModule to be present for progress events to work.
@@ -15,6 +14,8 @@ public final class FastImageGlideModule extends AppGlideModule {
     public void applyOptions(Context context, GlideBuilder builder) {
         int diskCacheSizeBytes = 1024 * 1024 * 100; // 100 MB
         builder.setDiskCache(
-                new InternalCacheDiskCacheFactory(context, "cacheFolderName", diskCacheSizeBytes));
+                new MultipleFolderInternalCacheDiskCacheFactory(context, diskCacheSizeBytes));
     }
+
+
 }

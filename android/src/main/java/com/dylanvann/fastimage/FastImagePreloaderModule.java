@@ -103,24 +103,4 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
             }
         });
     }
-
-    @ReactMethod
-    public void remove(final ReadableArray sources, Promise promise) {
-        final Activity activity = getCurrentActivity();
-
-        for (int i = 0; i < sources.size(); i++) {
-            final ReadableMap source = sources.getMap(i);
-            final FastImageSource imageSource = FastImageViewConverter.getImageSource(activity, source);
-            try {
-                Glide.with(activity.getApplicationContext()).downloadOnly()
-                        .load(imageSource.isBase64Resource() ? imageSource.getSource()
-                                : imageSource.isResource() ? imageSource.getUri() : imageSource.getGlideUrl())
-                        .apply(new RequestOptions()
-                                .signature(new ObjectKey("inactive"))).submit();
-            } catch (Exception e) {
-                Log.d(LOG, e.getMessage());
-            }
-        }
-        promise.resolve("Removing images from cache by sourse is not supported on Android.");
-    }
 }
