@@ -109,4 +109,9 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
             }
         });
     }
+
+    @ReactMethod
+    public void remove(final String namespace) {
+        MultiFolderDiskLruCacheWrapper.diskCaches.remove(namespace);
+    }
 }

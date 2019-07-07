@@ -14,7 +14,6 @@ import com.bumptech.glide.signature.EmptySignature;
 import com.bumptech.glide.signature.ObjectKey;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +27,6 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     private static Field sFieldSignatureInDataCacheKey;
     private static Field sFieldSourceKeyInDataCacheKey;
     private static Field sFieldObjectKey;
-
-    // private static MultiFolderDiskLruCacheWrapper wrapper;
 
     static {
         try {
@@ -61,15 +58,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     private final Context context;
 
-    private Map<String, DiskCache> diskCaches = new HashMap<>();
+    static public Map<String, DiskCache> diskCaches = new HashMap<>();
     private File directory;
-
-//    public static synchronized DiskCache get() {
-//        if (wrapper == null) {
-//            wrapper = new MultiFolderDiskLruCacheWrapper(null, 0, null);
-//        }
-//        return wrapper;
-//    }
 
     protected MultiFolderDiskLruCacheWrapper(File directory, long maxSize, Context context) {
         super(directory, maxSize);
