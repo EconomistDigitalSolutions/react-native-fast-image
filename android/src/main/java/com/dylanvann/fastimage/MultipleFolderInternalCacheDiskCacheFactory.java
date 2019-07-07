@@ -14,7 +14,7 @@ public class MultipleFolderInternalCacheDiskCacheFactory extends MultipleFolderD
     }
 
     public MultipleFolderInternalCacheDiskCacheFactory(Context context, long diskCacheSize) {
-        this(context, DiskCache.Factory.DEFAULT_DISK_CACHE_DIR, diskCacheSize);
+        this(context, "", diskCacheSize);
     }
 
     public MultipleFolderInternalCacheDiskCacheFactory(final Context context, final String diskCacheName,

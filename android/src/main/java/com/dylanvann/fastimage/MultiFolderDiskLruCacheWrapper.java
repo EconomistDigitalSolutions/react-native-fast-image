@@ -130,7 +130,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         DiskCache diskCache = diskCaches.get(cacheFolder);
         if (diskCache == null) {
             String cacheFolderPath = cacheFolder instanceof EmptySignature ? "default" : (String) cacheFolder;
-            String cachePath = directory.getAbsolutePath() + "/" + cacheFolderPath;
+            String cachePath = directory.getAbsolutePath()  + cacheFolderPath;
             Log.d(LOG, "cachePath: " + cachePath);
             File fileCachePath = new File(cachePath);
 
