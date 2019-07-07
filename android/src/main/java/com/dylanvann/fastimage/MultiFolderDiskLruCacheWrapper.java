@@ -9,6 +9,7 @@ import android.util.Log;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
+import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.signature.EmptySignature;
 import com.bumptech.glide.signature.ObjectKey;
 
@@ -142,21 +143,21 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     @Nullable
     private String getSourceKey(Key key) {
-        String sourceKey = null;
+        GlideUrl sourceKey = null;
         try {
-            sourceKey = (String) sFieldSourceKeyInResourceCacheKey.get(key);
+            sourceKey = (GlideUrl) sFieldSourceKeyInResourceCacheKey.get(key);
         } catch (Exception e) {
             Log.d(LOG, "getSignature: " + e.getMessage());
 
         }
-        if (sourceKey != null) return sourceKey;
+        if (sourceKey != null) return sourceKey.toStringUrl();
 
         try {
-            sourceKey = (String) sFieldSourceKeyInDataCacheKey.get(key);
+            sourceKey = (GlideUrl) sFieldSourceKeyInDataCacheKey.get(key);
         } catch (Exception e) {
             Log.d(LOG, "getSignature: " + e.getMessage());
         }
-        return sourceKey;
+        return sourceKey.toStringUrl();
     }
 
     @NonNull
