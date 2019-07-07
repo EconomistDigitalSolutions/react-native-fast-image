@@ -94,7 +94,7 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                         // This image will have an expiration time of max age passed from the params.
                         // re-request periodically (balanced performance, if period is big enough, say a week)
                         requestBuilder = requestBuilder.apply(new RequestOptions()
-                                .signature(new ObjectKey(String.format("%s%s", fastImagePreloaderConfiguration.getNamespace(), maxAgeSignature)))
+                                .signature(new ObjectKey(String.format("%s", fastImagePreloaderConfiguration.getNamespace())))
                         );
                     }
                     requestBuilder.apply(FastImageViewConverter.getOptions(source))
