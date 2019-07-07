@@ -1,6 +1,8 @@
 package com.dylanvann.fastimage;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -15,8 +17,6 @@ import com.facebook.react.bridge.ReadableMap;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import android.util.Log;
 
 class FastImagePreloaderModule extends ReactContextBaseJavaModule {
 
@@ -99,6 +99,12 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                     }
                     requestBuilder.apply(FastImageViewConverter.getOptions(source))
                             .preload();
+                    if (fastImagePreloaderConfiguration.getNamespace() != null) {
+                        SharedPreferences sharedPref = activity.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(resource.toString(), fastImagePreloaderConfiguration.getNamespace());
+                        editor.apply();
+                    }
                 }
             }
         });

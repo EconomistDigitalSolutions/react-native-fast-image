@@ -31,6 +31,6 @@ public class MultipleFolderInternalCacheDiskCacheFactory extends MultipleFolderD
                 }
                 return cacheDirectory;
             }
-        }, diskCacheSize);
+        }, diskCacheSize, context);
     }
 }

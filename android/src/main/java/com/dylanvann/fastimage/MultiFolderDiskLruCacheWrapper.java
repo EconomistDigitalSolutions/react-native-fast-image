@@ -1,6 +1,7 @@
 package com.dylanvann.fastimage;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -22,16 +23,21 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     private static final String LOG = "[FFFastImage]";
 
     private static Field sFieldSignatureInResourceCacheKey;
+    private static Field sFieldSourceKeyInResourceCacheKey;
     private static Field sFieldSignatureInDataCacheKey;
+    private static Field sFieldSourceKeyInDataCacheKey;
     private static Field sFieldObjectKey;
 
-    private static MultiFolderDiskLruCacheWrapper wrapper;
+    // private static MultiFolderDiskLruCacheWrapper wrapper;
 
     static {
         try {
             Class<?> resourceCacheKeyClass = Class.forName("com.bumptech.glide.load.engine.ResourceCacheKey");
             sFieldSignatureInResourceCacheKey = resourceCacheKeyClass.getDeclaredField("signature");
             sFieldSignatureInResourceCacheKey.setAccessible(true);
+
+            sFieldSourceKeyInResourceCacheKey = resourceCacheKeyClass.getDeclaredField("sourceKey");
+            sFieldSourceKeyInResourceCacheKey.setAccessible(true);
 
             Class<?> objectKeyClass = Class.forName("com.bumptech.glide.signature.ObjectKey");
             sFieldObjectKey = objectKeyClass.getDeclaredField("object");
@@ -40,6 +46,9 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             Class<?> DataCacheKeyClass = Class.forName("com.bumptech.glide.load.engine.DataCacheKey");
             sFieldSignatureInDataCacheKey = DataCacheKeyClass.getDeclaredField("signature");
             sFieldSignatureInDataCacheKey.setAccessible(true);
+
+            sFieldSourceKeyInDataCacheKey = DataCacheKeyClass.getDeclaredField("sourceKey");
+            sFieldSourceKeyInDataCacheKey.setAccessible(true);
         } catch (ClassNotFoundException e) {
             Log.d(LOG, "find ResourceCacheKey failed", e);
         } catch (NoSuchFieldException e) {
@@ -49,20 +58,23 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         }
     }
 
+    private final Context context;
+
     private Map<String, DiskCache> diskCaches = new HashMap<>();
     private File directory;
 
-    public static synchronized DiskCache get() {
-        if (wrapper == null) {
-            wrapper = new MultiFolderDiskLruCacheWrapper(null, 0);
-        }
-        return wrapper;
-    }
+//    public static synchronized DiskCache get() {
+//        if (wrapper == null) {
+//            wrapper = new MultiFolderDiskLruCacheWrapper(null, 0, null);
+//        }
+//        return wrapper;
+//    }
 
-    protected MultiFolderDiskLruCacheWrapper(File directory, long maxSize) {
+    protected MultiFolderDiskLruCacheWrapper(File directory, long maxSize, Context context) {
         super(directory, maxSize);
 
         this.directory = directory;
+        this.context = context;
     }
 
     @Override
@@ -93,14 +105,17 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         Object cacheFolderSignature = getSignature(key);
         Object cacheFolder = null;
 
-        if(cacheFolderSignature instanceof ObjectKey) {
+        if (cacheFolderSignature instanceof ObjectKey) {
             try {
                 cacheFolder = sFieldObjectKey.get(cacheFolderSignature);
             } catch (IllegalAccessException e) {
                 Log.d(LOG, "getSignature: " + e.getMessage());
             }
         } else {
-            cacheFolder = cacheFolderSignature;
+            String sourceKey = getSourceKey(key);
+            SharedPreferences sharedPref = context.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
+
+            cacheFolder = sharedPref.getString(sourceKey, "");
         }
 
         return getDiskCache(cacheFolder);
@@ -115,7 +130,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             Log.d(LOG, "getSignature: " + e.getMessage());
 
         }
-        if (signature != null) return  signature;
+        if (signature != null) return signature;
 
         try {
             signature = sFieldSignatureInDataCacheKey.get(key);
@@ -125,12 +140,33 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         return signature;
     }
 
+    @Nullable
+    private String getSourceKey(Key key) {
+        String sourceKey = null;
+        try {
+            sourceKey = (String) sFieldSourceKeyInResourceCacheKey.get(key);
+        } catch (Exception e) {
+            Log.d(LOG, "getSignature: " + e.getMessage());
+
+        }
+        if (sourceKey != null) return sourceKey;
+
+        try {
+            sourceKey = (String) sFieldSourceKeyInDataCacheKey.get(key);
+        } catch (Exception e) {
+            Log.d(LOG, "getSignature: " + e.getMessage());
+        }
+        return sourceKey;
+    }
+
     @NonNull
     private DiskCache getDiskCache(Object cacheFolder) {
+        Log.d(LOG, "cacheFolder: " + cacheFolder);
+
         DiskCache diskCache = diskCaches.get(cacheFolder);
         if (diskCache == null) {
             String cacheFolderPath = cacheFolder instanceof EmptySignature ? "/default" : (String) cacheFolder;
-            String cachePath = directory.getAbsolutePath()  + cacheFolderPath;
+            String cachePath = directory.getAbsolutePath() + cacheFolderPath;
             Log.d(LOG, "cachePath: " + cachePath);
             File fileCachePath = new File(cachePath);
 
@@ -145,7 +181,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
                 diskCache = DiskLruCacheWrapper.create(fileCachePath, 1024 * 1024 * 100);
 
-                diskCaches.put(cacheFolder.toString(), diskCache) ;
+                diskCaches.put(cacheFolder.toString(), diskCache);
             } catch (Exception e) {
                 Log.d(LOG, "getDiskCache: " + e.getMessage());
 
