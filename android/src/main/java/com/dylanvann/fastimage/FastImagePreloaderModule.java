@@ -113,5 +113,14 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void remove(final String namespace) {
         MultiFolderDiskLruCacheWrapper.diskCaches.remove(namespace);
+
+        final Activity activity = getCurrentActivity();
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Glide.get(activity).clearMemory();
+            }
+        });
     }
 }

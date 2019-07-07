@@ -166,10 +166,6 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             }
 
             try {
-                //Class<?> clazz = Class.forName("com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper");
-                //Constructor<?> ctor = clazz.getConstructor(String.class);
-                //diskCache = (DiskLruCacheWrapper) ctor.newInstance(new Object[]{fileCachePath, 1024 * 1024 * 100});
-
                 diskCache = DiskLruCacheWrapper.create(fileCachePath, 1024 * 1024 * 100);
 
                 diskCaches.put(cacheFolder.toString(), diskCache);
