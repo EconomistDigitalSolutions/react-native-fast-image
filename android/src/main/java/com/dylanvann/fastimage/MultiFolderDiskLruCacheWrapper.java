@@ -112,19 +112,21 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         DiskCache diskCache = diskCaches.get(cacheFolder);
         if (diskCache == null) {
             String cacheFolderPath = cacheFolder instanceof EmptySignature ? "default" : (String) cacheFolder;
-            String cachePath = directory.getAbsolutePath() + cacheFolderPath;
+            String cachePath = directory.getAbsolutePath() + "/" + cacheFolderPath;
             File fileCachePath = new File(cachePath);
-            if (fileCachePath.mkdirs()) {
-                try {
-                    Class<?> clazz = Class.forName("com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper");
-                    Constructor<?> ctor = clazz.getConstructor(String.class);
-                    diskCache = (DiskLruCacheWrapper) ctor.newInstance(new Object[]{new File(cachePath), 1024 * 1024 * 100});
 
-                    diskCaches.put(cacheFolder.toString(), diskCache) ;
-                } catch (Exception e) {
-                    Log.d(LOG, "getDiskCache: " + e.getMessage());
+            if (!fileCachePath.exists()) {
+                fileCachePath.mkdirs();
+            }
 
-                }
+            try {
+                Class<?> clazz = Class.forName("com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper");
+                Constructor<?> ctor = clazz.getConstructor(String.class);
+                diskCache = (DiskLruCacheWrapper) ctor.newInstance(new Object[]{fileCachePath, 1024 * 1024 * 100});
+
+                diskCaches.put(cacheFolder.toString(), diskCache) ;
+            } catch (Exception e) {
+                Log.d(LOG, "getDiskCache: " + e.getMessage());
 
             }
         }
