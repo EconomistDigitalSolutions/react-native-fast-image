@@ -9,6 +9,7 @@ import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
 import com.bumptech.glide.signature.EmptySignature;
+import com.bumptech.glide.signature.ObjectKey;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -22,6 +23,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     private static Field sFieldSignatureInResourceCacheKey;
     private static Field sFieldSignatureInDataCacheKey;
+    private static Field sFieldObjectKey;
+
     private static MultiFolderDiskLruCacheWrapper wrapper;
 
     static {
@@ -29,6 +32,10 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             Class<?> resourceCacheKeyClass = Class.forName("com.bumptech.glide.load.engine.ResourceCacheKey");
             sFieldSignatureInResourceCacheKey = resourceCacheKeyClass.getDeclaredField("signature");
             sFieldSignatureInResourceCacheKey.setAccessible(true);
+
+            Class<?> objectKeyClass = Class.forName("com.bumptech.glide.signature.ObjectKey");
+            sFieldObjectKey = objectKeyClass.getDeclaredField("object");
+            sFieldObjectKey.setAccessible(true);
 
             Class<?> DataCacheKeyClass = Class.forName("com.bumptech.glide.load.engine.DataCacheKey");
             sFieldSignatureInDataCacheKey = DataCacheKeyClass.getDeclaredField("signature");
@@ -83,7 +90,18 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     }
 
     private DiskCache getDiskCacheBySignature(Key key) {
-        Object cacheFolder = getSignature(key);
+        Object cacheFolderSignature = getSignature(key);
+        Object cacheFolder = null;
+
+        if(cacheFolderSignature instanceof ObjectKey) {
+            try {
+                cacheFolder = sFieldObjectKey.get(cacheFolderSignature);
+            } catch (IllegalAccessException e) {
+                Log.d(LOG, "getSignature: " + e.getMessage());
+            }
+        } else {
+            cacheFolder = cacheFolderSignature;
+        }
 
         return getDiskCache(cacheFolder);
     }
