@@ -8,6 +8,7 @@ import android.util.Log;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
+import com.bumptech.glide.signature.EmptySignature;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -110,7 +111,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     private DiskCache getDiskCache(Object cacheFolder) {
         DiskCache diskCache = diskCaches.get(cacheFolder);
         if (diskCache == null) {
-            String cachePath = directory.getAbsolutePath() + cacheFolder;
+            String cacheFolderPath = cacheFolder instanceof EmptySignature ? "default" : (String) cacheFolder;
+            String cachePath = directory.getAbsolutePath() + cacheFolderPath;
             File fileCachePath = new File(cachePath);
             if (fileCachePath.mkdirs()) {
                 try {
