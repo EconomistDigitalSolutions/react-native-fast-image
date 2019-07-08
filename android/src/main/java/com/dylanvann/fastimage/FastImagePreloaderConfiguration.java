@@ -10,9 +10,6 @@ public class FastImagePreloaderConfiguration {
 
     private int maxCacheAge;
 
-    public FastImagePreloaderConfiguration() {
-
-    }
 
     public String getNamespace() {
         return namespace;

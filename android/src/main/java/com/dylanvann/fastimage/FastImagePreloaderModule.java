@@ -3,6 +3,7 @@ package com.dylanvann.fastimage;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -14,9 +15,12 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 class FastImagePreloaderModule extends ReactContextBaseJavaModule {
 
@@ -78,30 +82,20 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                     RequestBuilder requestBuilder = Glide
                             .with(activity.getApplicationContext())
                             .downloadOnly()
-                            // This will make this work for remote and local images. e.g.
-                            //    - file:///
-                            //    - content://
-                            //    - res:/
-                            //    - android.resource://
-                            //    - data:image/png;base64
                             .load(resource)
                             .listener(preloader);
 
+                    String objectSignature = FastImageUrlSignatureGenerator.getInstance().getSignature(fastImagePreloaderConfiguration);
 
-                    if (fastImagePreloaderConfiguration.getNamespace() != null) {
-                        String maxAgeSignature = String.valueOf(System.currentTimeMillis() / (fastImagePreloaderConfiguration.getMaxCacheAge() * 1000));
-                        String objectSignature = String.format("%s|%s|%s", fastImagePreloaderConfiguration.getNamespace(), maxAgeSignature, fastImagePreloaderConfiguration.getMaxCacheAge());
-                        // This image will have an expiration time of max age passed from the params.
-                        // re-request periodically (balanced performance, if period is big enough, say a week)
+                    if (!objectSignature.isEmpty()) {
                         requestBuilder = requestBuilder.apply(new RequestOptions()
                                 .signature(new ObjectKey(objectSignature))
                         );
 
-                        SharedPreferences sharedPref = activity.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(resource.toString(), objectSignature);
-                        editor.apply();
+                        FastImageUrlSignatureGenerator.getInstance().storeConfiguration(resource, fastImagePreloaderConfiguration);
                     }
+
+
                     requestBuilder.apply(FastImageViewConverter.getOptions(source))
                             .preload();
                 }

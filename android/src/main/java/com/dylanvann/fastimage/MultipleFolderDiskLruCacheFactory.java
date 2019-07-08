@@ -1,7 +1,5 @@
 package com.dylanvann.fastimage;
 
-import android.content.Context;
-
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheFactory;
 
@@ -12,7 +10,6 @@ public class MultipleFolderDiskLruCacheFactory implements DiskCache.Factory {
 
     private final long diskCacheSize;
     private final DiskLruCacheFactory.CacheDirectoryGetter cacheDirectoryGetter;
-    private final Context context;
 
 
     public interface CacheDirectoryGetter {
@@ -25,7 +22,7 @@ public class MultipleFolderDiskLruCacheFactory implements DiskCache.Factory {
             public File getCacheDirectory() {
                 return new File(diskCacheFolder);
             }
-        }, diskCacheSize, null);
+        }, diskCacheSize);
     }
 
     public MultipleFolderDiskLruCacheFactory(final String diskCacheFolder, final String diskCacheName,
@@ -35,15 +32,14 @@ public class MultipleFolderDiskLruCacheFactory implements DiskCache.Factory {
             public File getCacheDirectory() {
                 return new File(diskCacheFolder, diskCacheName);
             }
-        }, diskCacheSize, null);
+        }, diskCacheSize);
     }
 
 
     @SuppressWarnings("WeakerAccess")
-    public MultipleFolderDiskLruCacheFactory(DiskLruCacheFactory.CacheDirectoryGetter cacheDirectoryGetter, long diskCacheSize, Context context) {
+    public MultipleFolderDiskLruCacheFactory(DiskLruCacheFactory.CacheDirectoryGetter cacheDirectoryGetter, long diskCacheSize) {
         this.diskCacheSize = diskCacheSize;
         this.cacheDirectoryGetter = cacheDirectoryGetter;
-        this.context = context;
     }
 
     @Override
@@ -58,6 +54,6 @@ public class MultipleFolderDiskLruCacheFactory implements DiskCache.Factory {
             return null;
         }
 
-        return new MultiFolderDiskLruCacheWrapper(cacheDir, diskCacheSize, this.context);
+        return new MultiFolderDiskLruCacheWrapper(cacheDir, diskCacheSize);
     }
 }

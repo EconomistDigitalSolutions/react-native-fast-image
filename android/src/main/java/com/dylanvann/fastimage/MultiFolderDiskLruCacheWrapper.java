@@ -59,16 +59,13 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         }
     }
 
-    private final Context context;
-
     static public Map<String, DiskCache> diskCaches = new HashMap<>();
     private File directory;
 
-    protected MultiFolderDiskLruCacheWrapper(File directory, long maxSize, Context context) {
+    protected MultiFolderDiskLruCacheWrapper(File directory, long maxSize) {
         super(directory, maxSize);
 
         this.directory = directory;
-        this.context = context;
     }
 
     @Override
@@ -135,46 +132,70 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     private DiskCache getDiskCacheBySignature(Key key) {
         Object cacheFolderSignature = getSignature(key);
-        Object cacheFolder = null;
 
         if (cacheFolderSignature instanceof ObjectKey) {
-            try {
-                cacheFolder = sFieldObjectKey.get(cacheFolderSignature);
-            } catch (IllegalAccessException e) {
-                Log.d(LOG, "getSignature: " + e.getMessage());
-            }
-        } else {
-            cacheFolder = DEFAULT_CACHE;
+            String cacheIdentifier = getSourceKey(key);
+
+            return getDiskCache(cacheIdentifier);
+
         }
 
-        return getDiskCache((String) cacheFolder);
+        return getDefaultDiskCache();
     }
 
     @NonNull
-    private DiskCache getDiskCache(String cacheFolder) {
-        Log.d(LOG, "cacheFolder: " + cacheFolder);
+    private DiskCache getDiskCache(String cacheIdentifier) {
+        Log.d(LOG, "cacheIdentifier: " + cacheIdentifier);
 
-        DiskCache diskCache = diskCaches.get(cacheFolder);
+        FastImagePreloaderConfiguration conf = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(cacheIdentifier);
+        DiskCache diskCache = diskCaches.get(conf.getNamespace());
 
         if (diskCache == null) {
-            String cacheFolderPath = cacheFolder.equals(DEFAULT_CACHE) ? "/default" : cacheFolder.split("\\|")[0];
-            String cachePath = directory.getAbsolutePath() + cacheFolderPath;
-            Log.d(LOG, "cachePath: " + cachePath);
-            File fileCachePath = new File(cachePath);
+            String relativeCacheFolderPath = getRelativeCachePath(cacheIdentifier);
 
-            if (!fileCachePath.exists()) {
-                fileCachePath.mkdirs();
-            }
+            String cachePath = directory.getAbsolutePath() + relativeCacheFolderPath;
 
-            try {
-                diskCache = DiskLruCacheWrapper.create(fileCachePath, 1024 * 1024 * 100);
-
-                diskCaches.put(cacheFolder.toString(), diskCache);
-            } catch (Exception e) {
-                Log.d(LOG, "getDiskCache: " + e.getMessage());
-
-            }
+            diskCache = createNewDiskCache(cacheIdentifier, cachePath);
         }
         return diskCache;
+    }
+
+    @NonNull
+    private DiskCache getDefaultDiskCache() {
+        DiskCache diskCache = diskCaches.get(DEFAULT_CACHE);
+
+        if (diskCache == null) {
+            String relativeCacheFolderPath = getRelativeCachePath(DEFAULT_CACHE);
+            String cachePath = directory.getAbsolutePath() + relativeCacheFolderPath;
+
+            diskCache = createNewDiskCache(DEFAULT_CACHE, cachePath);
+        }
+        return diskCache;
+    }
+
+    private DiskCache createNewDiskCache(String cacheIdentifier, String cachePath) {
+        Log.d(LOG, "cachePath: " + cachePath);
+        File fileCachePath = new File(cachePath);
+
+        if (!fileCachePath.exists()) {
+            fileCachePath.mkdirs();
+        }
+
+        DiskCache diskCache = DiskLruCacheWrapper.create(fileCachePath, 1024 * 1024 * 100);
+
+        diskCaches.put(cacheIdentifier, diskCache);
+
+        return diskCache;
+    }
+
+    private String getRelativeCachePath(String cacheIdentifier) {
+        if (cacheIdentifier.equals(DEFAULT_CACHE)) {
+            return "/default";
+        }
+
+        FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(cacheIdentifier);
+
+
+        return configuration.getNamespace();
     }
 }

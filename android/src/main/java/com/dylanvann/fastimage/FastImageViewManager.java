@@ -102,32 +102,19 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
 
         if (requestManager != null) {
 
-
             RequestBuilder requestBuilder = requestManager
-                    // This will make this work for remote and local images. e.g.
-                    //    - file:///
-                    //    - content://
-                    //    - res:/
-                    //    - android.resource://
-                    //    - data:image/png;base64
                     .load(imageSource.getSourceForLoad())
                     .apply(FastImageViewConverter.getOptions(source));
 
-            SharedPreferences sharedPref = context.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
-
             GlideUrl url = (GlideUrl) imageSource.getSourceForLoad();
-            String objectSignature = sharedPref.getString(url.toStringUrl(), "");
+            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(url.toStringUrl());
 
-            if(!objectSignature.isEmpty()) {
-                String [] values = objectSignature.split("\\|");
+            if (configuration != null) {
+                String signature = FastImageUrlSignatureGenerator.getInstance().getSignature(configuration);
 
-                if(values.length > 0) {
-                    String maxAgeSignature = String.valueOf(System.currentTimeMillis() / (Integer.valueOf(values[2]) * 1000));
-                    String objectSignature2 = String.format("%s|%s|%s", values[0], maxAgeSignature, values[2]);
-                    requestBuilder = requestBuilder.apply(new RequestOptions()
-                            .signature(new ObjectKey(objectSignature2))
-                    );
-                }
+                requestBuilder = requestBuilder.apply(new RequestOptions()
+                        .signature(new ObjectKey(signature))
+                );
             }
 
 
