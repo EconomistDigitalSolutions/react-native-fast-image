@@ -120,11 +120,14 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
 
             if(!objectSignature.isEmpty()) {
                 String [] values = objectSignature.split("\\|");
-                String maxAgeSignature = String.valueOf(System.currentTimeMillis() / (Integer.valueOf(values[2]) * 1000));
-                String objectSignature2 = String.format("%s|%s|%s", values[0], maxAgeSignature, values[2]);
-                requestBuilder = requestBuilder.apply(new RequestOptions()
-                        .signature(new ObjectKey(objectSignature2))
-                );
+
+                if(values.length > 0) {
+                    String maxAgeSignature = String.valueOf(System.currentTimeMillis() / (Integer.valueOf(values[2]) * 1000));
+                    String objectSignature2 = String.format("%s|%s|%s", values[0], maxAgeSignature, values[2]);
+                    requestBuilder = requestBuilder.apply(new RequestOptions()
+                            .signature(new ObjectKey(objectSignature2))
+                    );
+                }
             }
 
 
