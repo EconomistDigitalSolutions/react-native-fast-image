@@ -1,7 +1,5 @@
 package com.dylanvann.fastimage;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -10,7 +8,6 @@ import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.DiskLruCacheWrapper;
 import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.signature.EmptySignature;
 import com.bumptech.glide.signature.ObjectKey;
 
 import java.io.File;
@@ -139,8 +136,6 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     @NonNull
     private DiskCache getDiskCache(String cacheIdentifier) {
-        Log.d(LOG, "cacheIdentifier: " + cacheIdentifier);
-
         FastImagePreloaderConfiguration conf = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(cacheIdentifier);
         DiskCache diskCache = diskCaches.get(conf.getNamespace());
 
@@ -168,7 +163,6 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     }
 
     private DiskCache createNewDiskCache(String cacheIdentifier, String cachePath) {
-        Log.d(LOG, "cachePath: " + cachePath);
         File fileCachePath = new File(cachePath);
 
         if (!fileCachePath.exists()) {

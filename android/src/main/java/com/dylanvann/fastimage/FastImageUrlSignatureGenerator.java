@@ -3,6 +3,7 @@ package com.dylanvann.fastimage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -10,9 +11,11 @@ import java.util.ArrayList;
 
 public class FastImageUrlSignatureGenerator {
 
-    public static final String NAMESPACE_IMAGES = "namespace_images";
+    private static final String LOG = "[FFFastImage]";
 
-    public FastImageUrlSignatureGenerator(Context context) {
+    private static final String NAMESPACE_IMAGES = "namespace_images";
+
+    private FastImageUrlSignatureGenerator(Context context) {
         this.context = context;
     }
 
@@ -45,18 +48,24 @@ public class FastImageUrlSignatureGenerator {
         }
 
         if (signatureParams.size() > 0) {
-            return TextUtils.join("|", signatureParams);
+
+            String signature = TextUtils.join("|", signatureParams);
+            Log.d(LOG, "Generated signature: " + signature);
+            return signature;
         }
 
+        Log.d(LOG, "Generated signature: " + "");
         return "";
     }
 
-    public void storeConfiguration(String url, FastImagePreloaderConfiguration fastImagePreloaderConfiguration) {
+    public void storeConfiguration(String url, FastImagePreloaderConfiguration configuration) {
+        Log.d(LOG, "Store url: " + url + "configuration: " + configuration.getNamespace() + ":" + configuration.getMaxCacheAge());
+
         SharedPreferences sharedPref = context.getSharedPreferences(NAMESPACE_IMAGES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         Gson gson = new Gson();
-        editor.putString(url, gson.toJson(fastImagePreloaderConfiguration));
+        editor.putString(url, gson.toJson(configuration));
         editor.apply();
     }
 
@@ -64,12 +73,16 @@ public class FastImageUrlSignatureGenerator {
         SharedPreferences sharedPref = context.getSharedPreferences(NAMESPACE_IMAGES, Context.MODE_PRIVATE);
         String configurationString = sharedPref.getString(url, "");
 
-        if(configurationString.isEmpty()) {
+        if (configurationString.isEmpty()) {
             return null;
         }
 
         Gson gson = new Gson();
 
-        return gson.fromJson(configurationString, FastImagePreloaderConfiguration.class);
+        FastImagePreloaderConfiguration configuration = gson.fromJson(configurationString, FastImagePreloaderConfiguration.class);
+
+        Log.d(LOG, "Store url: " + url + "configuration: " + configuration.getNamespace() + ":" + configuration.getMaxCacheAge());
+
+        return configuration;
     }
 }
