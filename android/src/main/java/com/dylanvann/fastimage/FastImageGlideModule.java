@@ -15,12 +15,6 @@ public final class FastImageGlideModule extends AppGlideModule {
     public void applyOptions(Context context, GlideBuilder builder) {
         int diskCacheSizeBytes = 1024 * 1024 * 100; // 100 MB
 
-        MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
-                .setMemoryCacheScreens(2)
-                .build();
-
-        builder.setMemoryCache(new MultipleFolderLruResourceCache(calculator.getMemoryCacheSize()));
-
         builder.setDiskCache(
                 new MultipleFolderInternalCacheDiskCacheFactory(context, diskCacheSizeBytes));
     }

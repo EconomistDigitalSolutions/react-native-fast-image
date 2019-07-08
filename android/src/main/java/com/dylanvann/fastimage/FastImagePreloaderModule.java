@@ -90,21 +90,20 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
 
                     if (fastImagePreloaderConfiguration.getNamespace() != null) {
                         String maxAgeSignature = String.valueOf(System.currentTimeMillis() / (fastImagePreloaderConfiguration.getMaxCacheAge() * 1000));
-
+                        String objectSignature = String.format("%s|%s|%s", fastImagePreloaderConfiguration.getNamespace(), maxAgeSignature, fastImagePreloaderConfiguration.getMaxCacheAge());
                         // This image will have an expiration time of max age passed from the params.
                         // re-request periodically (balanced performance, if period is big enough, say a week)
                         requestBuilder = requestBuilder.apply(new RequestOptions()
-                                .signature(new ObjectKey(String.format("%s", fastImagePreloaderConfiguration.getNamespace())))
+                                .signature(new ObjectKey(objectSignature))
                         );
+
+                        SharedPreferences sharedPref = activity.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(resource.toString(), objectSignature);
+                        editor.apply();
                     }
                     requestBuilder.apply(FastImageViewConverter.getOptions(source))
                             .preload();
-                    if (fastImagePreloaderConfiguration.getNamespace() != null) {
-                        SharedPreferences sharedPref = activity.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(resource.toString(), fastImagePreloaderConfiguration.getNamespace());
-                        editor.apply();
-                    }
                 }
             }
         });

@@ -22,6 +22,9 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     private static final String LOG = "[FFFastImage]";
 
+    private static final String DEFAULT_CACHE = "default";
+
+
     private static Field sFieldSignatureInResourceCacheKey;
     private static Field sFieldSourceKeyInResourceCacheKey;
     private static Field sFieldSignatureInDataCacheKey;
@@ -92,26 +95,6 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         }
     }
 
-    private DiskCache getDiskCacheBySignature(Key key) {
-        Object cacheFolderSignature = getSignature(key);
-        Object cacheFolder = null;
-
-        if (cacheFolderSignature instanceof ObjectKey) {
-            try {
-                cacheFolder = sFieldObjectKey.get(cacheFolderSignature);
-            } catch (IllegalAccessException e) {
-                Log.d(LOG, "getSignature: " + e.getMessage());
-            }
-        } else {
-            String sourceKey = getSourceKey(key);
-            SharedPreferences sharedPref = context.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
-
-            cacheFolder = sharedPref.getString(sourceKey, "");
-        }
-
-        return getDiskCache(cacheFolder);
-    }
-
     @Nullable
     private Object getSignature(Key key) {
         Object signature = null;
@@ -150,13 +133,31 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         return sourceKey.toStringUrl();
     }
 
+    private DiskCache getDiskCacheBySignature(Key key) {
+        Object cacheFolderSignature = getSignature(key);
+        Object cacheFolder = null;
+
+        if (cacheFolderSignature instanceof ObjectKey) {
+            try {
+                cacheFolder = sFieldObjectKey.get(cacheFolderSignature);
+            } catch (IllegalAccessException e) {
+                Log.d(LOG, "getSignature: " + e.getMessage());
+            }
+        } else {
+            cacheFolder = DEFAULT_CACHE;
+        }
+
+        return getDiskCache((String) cacheFolder);
+    }
+
     @NonNull
-    private DiskCache getDiskCache(Object cacheFolder) {
+    private DiskCache getDiskCache(String cacheFolder) {
         Log.d(LOG, "cacheFolder: " + cacheFolder);
 
         DiskCache diskCache = diskCaches.get(cacheFolder);
+
         if (diskCache == null) {
-            String cacheFolderPath = cacheFolder instanceof EmptySignature ? "/default" : (String) cacheFolder;
+            String cacheFolderPath = cacheFolder.equals(DEFAULT_CACHE) ? "/default" : cacheFolder.split("|")[0];
             String cachePath = directory.getAbsolutePath() + cacheFolderPath;
             Log.d(LOG, "cachePath: " + cachePath);
             File fileCachePath = new File(cachePath);

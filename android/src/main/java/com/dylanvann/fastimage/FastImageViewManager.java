@@ -2,12 +2,16 @@ package com.dylanvann.fastimage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
@@ -97,7 +101,9 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
         eventEmitter.receiveEvent(viewId, REACT_ON_LOAD_START_EVENT, new WritableNativeMap());
 
         if (requestManager != null) {
-            requestManager
+
+
+            RequestBuilder requestBuilder = requestManager
                     // This will make this work for remote and local images. e.g.
                     //    - file:///
                     //    - content://
@@ -105,8 +111,24 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
                     //    - android.resource://
                     //    - data:image/png;base64
                     .load(imageSource.getSourceForLoad())
-                    .apply(FastImageViewConverter.getOptions(source))
-                    .listener(new FastImageRequestListener(key))
+                    .apply(FastImageViewConverter.getOptions(source));
+
+            SharedPreferences sharedPref = context.getSharedPreferences("namespace_images", Context.MODE_PRIVATE);
+
+            GlideUrl url = (GlideUrl) imageSource.getSourceForLoad();
+            String objectSignature = sharedPref.getString(url.toStringUrl(), "");
+
+            if(!objectSignature.isEmpty()) {
+                String [] values = objectSignature.split("|");
+                String maxAgeSignature = String.valueOf(System.currentTimeMillis() / (Integer.valueOf(values[2]) * 1000));
+                String objectSignature2 = String.format("%s|%s|%s", values[0], maxAgeSignature, values[2]);
+                requestBuilder = requestBuilder.apply(new RequestOptions()
+                        .signature(new ObjectKey(objectSignature2))
+                );
+            }
+
+
+            requestBuilder.listener(new FastImageRequestListener(key))
                     .into(view);
         }
     }
