@@ -98,15 +98,12 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         try {
             signature = sFieldSignatureInResourceCacheKey.get(key);
         } catch (Exception e) {
-            Log.d(LOG, "getSignature: " + e.getMessage());
-
         }
         if (signature != null) return signature;
 
         try {
             signature = sFieldSignatureInDataCacheKey.get(key);
         } catch (Exception e) {
-            Log.d(LOG, "getSignature: " + e.getMessage());
         }
         return signature;
     }
@@ -117,15 +114,12 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInResourceCacheKey.get(key);
         } catch (Exception e) {
-            Log.d(LOG, "getSignature: " + e.getMessage());
-
         }
         if (sourceKey != null) return sourceKey.toStringUrl();
 
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInDataCacheKey.get(key);
         } catch (Exception e) {
-            Log.d(LOG, "getSignature: " + e.getMessage());
         }
         return sourceKey.toStringUrl();
     }
