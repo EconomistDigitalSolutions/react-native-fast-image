@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.facebook.react.bridge.Promise;
@@ -92,7 +93,9 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                                 .signature(new ObjectKey(objectSignature))
                         );
 
-                        FastImageUrlSignatureGenerator.getInstance().storeConfiguration(resource, fastImagePreloaderConfiguration);
+                        String url = resource instanceof GlideUrl ? ((GlideUrl) resource).toStringUrl() : (String) resource;
+
+                        FastImageUrlSignatureGenerator.getInstance().storeConfiguration(url, fastImagePreloaderConfiguration);
                     }
 
 
