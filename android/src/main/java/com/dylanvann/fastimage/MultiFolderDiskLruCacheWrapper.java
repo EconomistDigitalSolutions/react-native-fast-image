@@ -150,10 +150,12 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             String cachePath = directory.getAbsolutePath() + relativeCacheFolderPath;
 
+            Log.d(LOG, "cachePath: " + cachePath);
+
             diskCache = createNewDiskCache(cacheIdentifier, cachePath);
         }
 
-        Log.d(LOG, "Return cache: " + diskCache.toString());
+        Log.d(LOG, "Return cache: " + cacheIdentifier);
 
         return diskCache;
     }
@@ -165,6 +167,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         if (diskCache == null) {
             String relativeCacheFolderPath = getRelativeCachePath(DEFAULT_CACHE);
             String cachePath = directory.getAbsolutePath() + relativeCacheFolderPath;
+
+            Log.d(LOG, "default cachePath: " + cachePath);
 
             diskCache = createNewDiskCache(DEFAULT_CACHE, cachePath);
         }
