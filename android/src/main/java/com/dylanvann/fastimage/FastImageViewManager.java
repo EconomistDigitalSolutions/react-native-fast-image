@@ -3,6 +3,7 @@ package com.dylanvann.fastimage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -37,6 +38,7 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     private static final String REACT_ON_LOAD_START_EVENT = "onFastImageLoadStart";
     private static final String REACT_ON_PROGRESS_EVENT = "onFastImageProgress";
     private static final Map<String, List<FastImageViewWithUrl>> VIEWS_FOR_URLS = new WeakHashMap<>();
+    private static final String LOG = "Glide";
 
     @Nullable
     private RequestManager requestManager = null;
@@ -102,11 +104,12 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
                     .load(imageSource.getSourceForLoad())
                     .apply(FastImageViewConverter.getOptions(source));
 
-            GlideUrl url = (GlideUrl) imageSource.getSourceForLoad();
-            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(url.toStringUrl());
+            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(key);
 
             if (configuration != null) {
                 String signature = FastImageUrlSignatureGenerator.getInstance().getSignature(configuration);
+
+                Log.d(LOG, "Include signature: " + signature);
 
                 requestBuilder = requestBuilder.apply(new RequestOptions()
                         .signature(new ObjectKey(signature))
