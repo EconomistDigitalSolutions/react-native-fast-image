@@ -130,11 +130,11 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     private DiskCache getDiskCacheBySignature(Key key) {
         Object cacheFolderSignature = getSignature(key);
+        String cacheIdentifier = getSourceKey(key);
+        FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(cacheIdentifier);
 
-        if (cacheFolderSignature instanceof ObjectKey) {
-            String cacheIdentifier = getSourceKey(key);
-
-            return getDiskCache(cacheIdentifier);
+        if (cacheFolderSignature instanceof ObjectKey || configuration != null) {
+            return getDiskCache(cacheIdentifier, configuration);
 
         }
 
@@ -142,9 +142,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     }
 
     @NonNull
-    private DiskCache getDiskCache(String cacheIdentifier) {
-        FastImagePreloaderConfiguration conf = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(cacheIdentifier);
-        DiskCache diskCache = diskCaches.get(conf.getNamespace());
+    private DiskCache getDiskCache(String cacheIdentifier, FastImagePreloaderConfiguration configuration) {
+        DiskCache diskCache = diskCaches.get(configuration.getNamespace());
 
         if (diskCache == null) {
             String relativeCacheFolderPath = getRelativeCachePath(cacheIdentifier);
@@ -153,7 +152,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             Log.d(LOG, "cachePath: " + cachePath);
 
-            diskCache = createNewDiskCache(cachePath, conf.getNamespace());
+            diskCache = createNewDiskCache(cachePath, configuration.getNamespace());
         }
 
         Log.d(LOG, "Return cache: " + cacheIdentifier);
