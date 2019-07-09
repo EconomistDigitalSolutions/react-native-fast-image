@@ -69,12 +69,17 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     @Override
     public File get(Key key) {
-        return getDiskCacheBySignature(key).get(key);
+        DiskCache cache = getDiskCacheBySignature(key);
+        Log.d(LOG, "Key: " + key.toString() + "Cache: " + cache);
+
+        return cache.get(key);
     }
 
     @Override
     public void put(Key key, Writer writer) {
-        getDiskCacheBySignature(key).put(key, writer);
+        DiskCache cache = getDiskCacheBySignature(key);
+        Log.d(LOG, "Key: " + key.toString() + "Cache: " + cache);
+        cache.put(key, writer);
     }
 
     @Override
