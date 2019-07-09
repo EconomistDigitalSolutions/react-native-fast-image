@@ -153,7 +153,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             Log.d(LOG, "cachePath: " + cachePath);
 
-            diskCache = createNewDiskCache(cachePath);
+            diskCache = createNewDiskCache(cachePath, conf.getNamespace());
         }
 
         Log.d(LOG, "Return cache: " + cacheIdentifier);
@@ -171,7 +171,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             Log.d(LOG, "default cachePath: " + cachePath);
 
-            diskCache = createNewDiskCache(cachePath);
+            diskCache = createNewDiskCache(cachePath, DEFAULT_CACHE);
         }
 
         Log.d(LOG, "Return default cache: " + diskCache.toString());
@@ -179,7 +179,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         return diskCache;
     }
 
-    private DiskCache createNewDiskCache(String cachePath) {
+    private DiskCache createNewDiskCache(String cachePath, String cacheIdentifier) {
         DiskCache diskCache;
         File fileCachePath = new File(cachePath);
 
@@ -189,7 +189,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             diskCache = DiskLruCacheWrapper.get(fileCachePath, 1024 * 1024 * 100);
         }
 
-        diskCaches.put(cachePath, diskCache);
+        diskCaches.put(cacheIdentifier, diskCache);
 
         return diskCache;
     }
