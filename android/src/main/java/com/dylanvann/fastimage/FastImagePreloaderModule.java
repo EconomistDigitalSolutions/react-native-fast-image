@@ -1,9 +1,6 @@
 package com.dylanvann.fastimage;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -16,20 +13,15 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 class FastImagePreloaderModule extends ReactContextBaseJavaModule {
 
     private static final String REACT_CLASS = "FastImagePreloaderManager";
     private int preloaders = 0;
     private Map<Integer, FastImagePreloaderConfiguration> fastImagePreloaders = new HashMap<>();
-
-    private static final String LOG = "[FFFastImage]";
 
 
     FastImagePreloaderModule(ReactApplicationContext reactContext) {

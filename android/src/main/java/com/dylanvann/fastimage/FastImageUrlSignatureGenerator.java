@@ -13,8 +13,6 @@ import java.util.Map;
 
 public class FastImageUrlSignatureGenerator {
 
-    private static final String LOG = "[FFFastImage]";
-
     private static final String NAMESPACE_IMAGES = "namespace_images";
 
     private FastImageUrlSignatureGenerator(Context context) {

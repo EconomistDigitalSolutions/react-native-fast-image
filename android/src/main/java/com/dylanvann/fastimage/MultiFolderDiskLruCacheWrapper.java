@@ -2,7 +2,6 @@ package com.dylanvann.fastimage;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
@@ -48,11 +47,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             sFieldSourceKeyInDataCacheKey = DataCacheKeyClass.getDeclaredField("sourceKey");
             sFieldSourceKeyInDataCacheKey.setAccessible(true);
         } catch (ClassNotFoundException e) {
-            Log.d(LOG, "find ResourceCacheKey failed", e);
         } catch (NoSuchFieldException e) {
-            Log.d(LOG, "reflect signature failed", e);
         } catch (Error error) {
-            Log.d(LOG, "reflect signature failed", error);
         }
     }
 
@@ -94,13 +90,13 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         Object signature = null;
         try {
             signature = sFieldSignatureInResourceCacheKey.get(key);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (signature != null) return signature;
 
         try {
             signature = sFieldSignatureInDataCacheKey.get(key);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return signature;
     }
@@ -110,15 +106,15 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         GlideUrl sourceKey = null;
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInResourceCacheKey.get(key);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (sourceKey != null) return sourceKey.toStringUrl();
 
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInDataCacheKey.get(key);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        return sourceKey.toStringUrl();
+        return sourceKey != null ? sourceKey.toStringUrl() : "";
     }
 
     private DiskCache getDiskCacheBySignature(Key key) {

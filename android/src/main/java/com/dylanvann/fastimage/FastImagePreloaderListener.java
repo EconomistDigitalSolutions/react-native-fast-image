@@ -15,7 +15,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import java.io.File;
 
 class FastImagePreloaderListener implements RequestListener<File> {
-    private static final String LOG = "[FFFastImage]";
     private static final String EVENT_PROGRESS = "fffastimage-progress";
     private static final String EVENT_COMPLETE = "fffastimage-complete";
 
@@ -34,7 +33,6 @@ class FastImagePreloaderListener implements RequestListener<File> {
     @Override
     public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<File> target, boolean b) {
         // o is whatever was passed to .load() = GlideURL, String, etc.
-        Log.d(LOG, "Preload failed: " + o.toString());
         this.failed++;
         this.dispatchProgress();
         return false;
@@ -42,11 +40,6 @@ class FastImagePreloaderListener implements RequestListener<File> {
 
     @Override
     public boolean onResourceReady(File file, Object o, Target<File> target, DataSource dataSource, boolean b) {
-        // o is whatever was passed to .load() = GlideURL, String, etc.
-        Log.d(LOG, "File: " + file.toString());
-        Log.d(LOG, "Preload succeeded: " + o.toString());
-        Log.d(LOG, "dataSource: " + dataSource.toString());
-
         this.succeeded++;
         this.dispatchProgress();
         return false;

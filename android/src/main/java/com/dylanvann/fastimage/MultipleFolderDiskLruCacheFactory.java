@@ -12,30 +12,6 @@ public class MultipleFolderDiskLruCacheFactory implements DiskCache.Factory {
     private final DiskLruCacheFactory.CacheDirectoryGetter cacheDirectoryGetter;
 
 
-    public interface CacheDirectoryGetter {
-        File getCacheDirectory();
-    }
-
-    public MultipleFolderDiskLruCacheFactory(final String diskCacheFolder, long diskCacheSize) {
-        this(new DiskLruCacheFactory.CacheDirectoryGetter() {
-            @Override
-            public File getCacheDirectory() {
-                return new File(diskCacheFolder);
-            }
-        }, diskCacheSize);
-    }
-
-    public MultipleFolderDiskLruCacheFactory(final String diskCacheFolder, final String diskCacheName,
-                                             long diskCacheSize) {
-        this(new DiskLruCacheFactory.CacheDirectoryGetter() {
-            @Override
-            public File getCacheDirectory() {
-                return new File(diskCacheFolder, diskCacheName);
-            }
-        }, diskCacheSize);
-    }
-
-
     @SuppressWarnings("WeakerAccess")
     public MultipleFolderDiskLruCacheFactory(DiskLruCacheFactory.CacheDirectoryGetter cacheDirectoryGetter, long diskCacheSize) {
         this.diskCacheSize = diskCacheSize;
