@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,5 +111,8 @@ class FastImagePreloaderModule extends ReactContextBaseJavaModule {
                 Glide.get(activity).clearMemory();
             }
         });
+
+        File directoryFile = new File(activity.getCacheDir().getAbsolutePath() + namespace);
+        directoryFile.delete();
     }
 }
