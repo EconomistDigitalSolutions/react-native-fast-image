@@ -56,6 +56,10 @@ public class FastImageUrlSignatureGenerator {
     }
 
     public void storeConfiguration(String url, FastImagePreloaderConfiguration configuration) {
+        if (cacheConfigurations.containsKey(url)) {
+            return;
+        }
+
         cacheConfigurations.put(url, configuration);
 
         SharedPreferences sharedPref = context.getSharedPreferences(NAMESPACE_IMAGES, Context.MODE_PRIVATE);
@@ -66,7 +70,7 @@ public class FastImageUrlSignatureGenerator {
         editor.apply();
     }
 
-    public FastImagePreloaderConfiguration getConfigurationIfAvailable(String url) {
+    public FastImagePreloaderConfiguration fetchConfiguration(String url) {
         FastImagePreloaderConfiguration cacheConfiguration = cacheConfigurations.get(url);
         if (cacheConfiguration != null) {
             return cacheConfiguration;
@@ -81,6 +85,10 @@ public class FastImageUrlSignatureGenerator {
 
         Gson gson = new Gson();
 
-        return gson.fromJson(configurationString, FastImagePreloaderConfiguration.class);
+        FastImagePreloaderConfiguration configuration = gson.fromJson(configurationString, FastImagePreloaderConfiguration.class);
+
+        cacheConfigurations.put(url, configuration);
+
+        return configuration;
     }
 }

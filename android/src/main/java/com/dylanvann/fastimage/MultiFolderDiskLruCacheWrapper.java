@@ -102,14 +102,12 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         try {
             signature = sFieldSignatureInResourceCacheKey.get(key);
         } catch (Exception ignored) {
-            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         if (signature != null) return signature;
 
         try {
             signature = sFieldSignatureInDataCacheKey.get(key);
         } catch (Exception ignored) {
-            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         return signature;
     }
@@ -120,14 +118,12 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInResourceCacheKey.get(key);
         } catch (Exception ignored) {
-            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         if (sourceKey != null) return sourceKey.toStringUrl();
 
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInDataCacheKey.get(key);
         } catch (Exception ignored) {
-            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         return sourceKey != null ? sourceKey.toStringUrl() : "";
     }
@@ -147,7 +143,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
     @NonNull
     private DiskCache getDiskCache(String cacheIdentifier) {
-        FastImagePreloaderConfiguration conf = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(cacheIdentifier);
+        FastImagePreloaderConfiguration conf = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(cacheIdentifier);
         DiskCache diskCache = diskCaches.get(conf.getNamespace());
 
         if (diskCache == null) {
@@ -202,7 +198,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             return "/default";
         }
 
-        FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(cacheIdentifier);
+        FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(cacheIdentifier);
 
 
         return configuration.getNamespace();

@@ -104,7 +104,7 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
                     .load(imageSource.getSourceForLoad())
                     .apply(FastImageViewConverter.getOptions(source));
 
-            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().getConfigurationIfAvailable(key);
+            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(key);
 
             if (configuration != null) {
                 String signature = FastImageUrlSignatureGenerator.getInstance().getSignature(configuration);
