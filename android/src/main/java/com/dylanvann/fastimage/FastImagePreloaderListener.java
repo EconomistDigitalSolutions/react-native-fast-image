@@ -1,7 +1,6 @@
 package com.dylanvann.fastimage;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -18,7 +17,6 @@ class FastImagePreloaderListener implements RequestListener<File> {
     private static final String EVENT_PROGRESS = "fffastimage-progress";
     private static final String EVENT_COMPLETE = "fffastimage-complete";
 
-    private static final String LOG = "Glide";
 
     private final ReactApplicationContext reactContext;
     private final int id;
@@ -35,8 +33,6 @@ class FastImagePreloaderListener implements RequestListener<File> {
     @Override
     public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<File> target, boolean b) {
         // o is whatever was passed to .load() = GlideURL, String, etc.
-        Log.d(LOG, "Preload failed: " + o.toString());
-
         this.failed++;
         this.dispatchProgress();
         return false;
@@ -44,9 +40,6 @@ class FastImagePreloaderListener implements RequestListener<File> {
 
     @Override
     public boolean onResourceReady(File file, Object o, Target<File> target, DataSource dataSource, boolean b) {
-        Log.d(LOG, "Preload succeeded: " + o.toString());
-        Log.d(LOG, "dataSource: " + dataSource.toString());
-
         this.succeeded++;
         this.dispatchProgress();
         return false;

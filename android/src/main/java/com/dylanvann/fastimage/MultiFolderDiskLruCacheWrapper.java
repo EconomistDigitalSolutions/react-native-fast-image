@@ -2,7 +2,6 @@ package com.dylanvann.fastimage;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
@@ -16,8 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
-
-    private static final String LOG = "Glide";
 
     private static final String DEFAULT_CACHE = "default";
 
@@ -47,14 +44,9 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             sFieldSourceKeyInDataCacheKey = DataCacheKeyClass.getDeclaredField("sourceKey");
             sFieldSourceKeyInDataCacheKey.setAccessible(true);
-        } catch (ClassNotFoundException e) {
-            Log.d(LOG, "Error: " + e.getMessage());
-
-        } catch (NoSuchFieldException e) {
-            Log.d(LOG, "Error: " + e.getMessage());
-        } catch (Error error) {
-            Log.d(LOG, "Error: " + error.getMessage());
-
+        } catch (ClassNotFoundException ignored) {
+        } catch (NoSuchFieldException ignored) {
+        } catch (Error ignored) {
         }
     }
 
@@ -70,7 +62,6 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     @Override
     public File get(Key key) {
         DiskCache cache = getDiskCacheBySignature(key);
-        Log.d(LOG, "Key: " + key.toString() + "Cache: " + cache);
 
         return cache.get(key);
     }
@@ -78,7 +69,7 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     @Override
     public void put(Key key, Writer writer) {
         DiskCache cache = getDiskCacheBySignature(key);
-        Log.d(LOG, "Key: " + key.toString() + "Cache: " + cache);
+
         cache.put(key, writer);
     }
 
@@ -150,12 +141,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             String cachePath = directory.getAbsolutePath() + relativeCacheFolderPath;
 
-            Log.d(LOG, "cachePath: " + cachePath);
-
             diskCache = createNewDiskCache(cachePath, configuration.getNamespace());
         }
-
-        Log.d(LOG, "Return cache: " + cacheIdentifier);
 
         return diskCache;
     }
@@ -168,12 +155,8 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             String relativeCacheFolderPath = getRelativeCachePath(DEFAULT_CACHE);
             String cachePath = directory.getAbsolutePath() + relativeCacheFolderPath;
 
-            Log.d(LOG, "default cachePath: " + cachePath);
-
             diskCache = createNewDiskCache(cachePath, DEFAULT_CACHE);
         }
-
-        Log.d(LOG, "Return default cache: " + diskCache.toString());
 
         return diskCache;
     }

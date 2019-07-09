@@ -38,7 +38,6 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     private static final String REACT_ON_LOAD_START_EVENT = "onFastImageLoadStart";
     private static final String REACT_ON_PROGRESS_EVENT = "onFastImageProgress";
     private static final Map<String, List<FastImageViewWithUrl>> VIEWS_FOR_URLS = new WeakHashMap<>();
-    private static final String LOG = "Glide";
 
     @Nullable
     private RequestManager requestManager = null;
@@ -108,8 +107,6 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
 
             if (configuration != null) {
                 String signature = FastImageUrlSignatureGenerator.getInstance().getSignature(configuration);
-
-                Log.d(LOG, "Include signature: " + signature);
 
                 requestBuilder = requestBuilder.apply(new RequestOptions()
                         .signature(new ObjectKey(signature))
