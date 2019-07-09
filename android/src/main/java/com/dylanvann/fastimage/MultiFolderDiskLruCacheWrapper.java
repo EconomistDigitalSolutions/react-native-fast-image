@@ -2,6 +2,7 @@ package com.dylanvann.fastimage;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.cache.DiskCache;
@@ -47,8 +48,13 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
             sFieldSourceKeyInDataCacheKey = DataCacheKeyClass.getDeclaredField("sourceKey");
             sFieldSourceKeyInDataCacheKey.setAccessible(true);
         } catch (ClassNotFoundException e) {
+            Log.d(LOG, "Error: " + e.getMessage());
+
         } catch (NoSuchFieldException e) {
+            Log.d(LOG, "Error: " + e.getMessage());
         } catch (Error error) {
+            Log.d(LOG, "Error: " + error.getMessage());
+
         }
     }
 
@@ -91,12 +97,14 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         try {
             signature = sFieldSignatureInResourceCacheKey.get(key);
         } catch (Exception ignored) {
+            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         if (signature != null) return signature;
 
         try {
             signature = sFieldSignatureInDataCacheKey.get(key);
         } catch (Exception ignored) {
+            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         return signature;
     }
@@ -107,12 +115,14 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInResourceCacheKey.get(key);
         } catch (Exception ignored) {
+            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         if (sourceKey != null) return sourceKey.toStringUrl();
 
         try {
             sourceKey = (GlideUrl) sFieldSourceKeyInDataCacheKey.get(key);
         } catch (Exception ignored) {
+            Log.d(LOG, "Error: " + ignored.getMessage());
         }
         return sourceKey != null ? sourceKey.toStringUrl() : "";
     }
@@ -142,6 +152,9 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             diskCache = createNewDiskCache(cacheIdentifier, cachePath);
         }
+
+        Log.d(LOG, "Return cache: " + diskCache.toString());
+
         return diskCache;
     }
 
@@ -155,6 +168,9 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
             diskCache = createNewDiskCache(DEFAULT_CACHE, cachePath);
         }
+
+        Log.d(LOG, "Return default cache: " + diskCache.toString());
+
         return diskCache;
     }
 

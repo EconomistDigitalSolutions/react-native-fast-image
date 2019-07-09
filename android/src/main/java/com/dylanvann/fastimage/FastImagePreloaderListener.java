@@ -44,7 +44,8 @@ class FastImagePreloaderListener implements RequestListener<File> {
 
     @Override
     public boolean onResourceReady(File file, Object o, Target<File> target, DataSource dataSource, boolean b) {
-        Log.d(LOG, "Target: " + target.getRequest().toString());
+        Log.d(LOG, "Preload succeeded: " + o.toString());
+        Log.d(LOG, "dataSource: " + dataSource.toString());
 
         this.succeeded++;
         this.dispatchProgress();

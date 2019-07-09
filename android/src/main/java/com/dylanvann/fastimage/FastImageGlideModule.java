@@ -18,7 +18,7 @@ public final class FastImageGlideModule extends AppGlideModule {
 
         FastImageUrlSignatureGenerator.createGenerator(context);
 
-        int diskCacheSizeBytes = 1024 * 1024 * 200; // 200 MB
+        int diskCacheSizeBytes = 1024 * 1024 * 100; // 100 MB
 
         builder.setDiskCache(
                 new MultipleFolderInternalCacheDiskCacheFactory(context, diskCacheSizeBytes));
