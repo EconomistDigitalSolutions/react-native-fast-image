@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
 
-    private static final String LOG = "[FFFastImage]";
+    private static final String LOG = "Glide";
 
     private static final String DEFAULT_CACHE = "default";
 
