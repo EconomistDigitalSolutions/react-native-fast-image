@@ -180,13 +180,14 @@ public class MultiFolderDiskLruCacheWrapper extends DiskLruCacheWrapper {
     }
 
     private DiskCache createNewDiskCache(String cacheIdentifier, String cachePath) {
+        DiskCache diskCache;
         File fileCachePath = new File(cachePath);
 
         if (!fileCachePath.exists()) {
-            fileCachePath.mkdirs();
+            diskCache = DiskLruCacheWrapper.create(fileCachePath, 1024 * 1024 * 300);
+        } else {
+            diskCache = DiskLruCacheWrapper.get(fileCachePath, 1024 * 1024 * 300);
         }
-
-        DiskCache diskCache = DiskLruCacheWrapper.create(fileCachePath, 1024 * 1024 * 100);
 
         diskCaches.put(cacheIdentifier, diskCache);
 
