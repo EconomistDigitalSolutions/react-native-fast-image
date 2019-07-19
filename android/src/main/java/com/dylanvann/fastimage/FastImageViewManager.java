@@ -2,6 +2,8 @@ package com.dylanvann.fastimage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 
@@ -20,6 +22,8 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -116,6 +120,25 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
 
             requestBuilder.listener(new FastImageRequestListener(key))
                     .into(view);
+        }
+    }
+
+    @ReactProp(name = "placeholder")
+    public void setPlaceholder(FastImageViewWithUrl view, @Nullable ReadableMap placeholder) {
+        if (requestManager != null) {
+            try {
+                final FastImageSource imageSource = FastImageViewConverter.getImageSource(view.getContext(), placeholder);
+
+                requestManager.load("")
+                        .apply(new RequestOptions()
+                                .placeholder(Drawable.createFromStream((InputStream) imageSource.getGlideUrl().toURL().getContent(), "placeholder"
+                                )))
+                        .into(view);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
     }
 
