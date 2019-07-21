@@ -125,9 +125,9 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     }
 
     @ReactProp(name = "placeholder")
-    public void setPlaceholder(FastImageViewWithUrl view, @Nullable String placeholder) {
-        if (requestManager != null) {
-            Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(), placeholder);
+    public void setPlaceholder(FastImageViewWithUrl view, @Nullable ReadableMap placeholder) {
+        if (requestManager != null && !isNullOrEmpty(placeholder.getString("uri"))) {
+            Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(), placeholder.getString("uri"));
 
             requestManager.load("")
                     .apply(new RequestOptions()
