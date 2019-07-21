@@ -36,7 +36,6 @@ import javax.annotation.Nullable;
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_ERROR_EVENT;
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_LOAD_END_EVENT;
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_LOAD_EVENT;
-import static java.security.AccessController.getContext;
 
 class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> implements FastImageProgressListener {
 
@@ -129,7 +128,7 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     public void setPlaceholder(FastImageViewWithUrl view, @Nullable String placeholder) {
         if (requestManager != null) {
             try {
-                Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(getContext(), placeholder);
+                Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(), placeholder);
 
                 requestManager.load("")
                         .apply(new RequestOptions()
