@@ -33,13 +33,7 @@ class FastImage extends Component {
             ...props
         } = this.props;
 
-        const resolvedSource =
-            Platform.OS === 'Android'
-                ? {
-                      source: Image.resolveAssetSource(source),
-                      placeholder: Image.resolveAssetSource(placeholder)
-                  }
-                : Image.resolveAssetSource(source);
+        const resolvedSource = Image.resolveAssetSource(source);
         const resolvedPlaceholder = Image.resolveAssetSource(placeholder);
 
         if (fallback) {
