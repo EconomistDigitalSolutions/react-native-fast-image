@@ -23,6 +23,8 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +62,10 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     }
 
     @ReactProp(name = "source")
-    public void setSrc(FastImageViewWithUrl view, @Nullable ReadableMap source) {
+    public void setSrc(FastImageViewWithUrl view, @Nullable ReadableMap sourcesMap) {
+        ReadableMap source = sourcesMap.getMap("source");
+        ReadableMap placeholder = sourcesMap.getMap("placeholder");
+
         if (source == null || !source.hasKey("uri") || isNullOrEmpty(source.getString("uri"))) {
             // Cancel existing requests.
             if (requestManager != null) {
@@ -75,7 +80,8 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
             return;
         }
 
-        //final GlideUrl glideUrl = FastImageViewConverter.getGlideUrl(view.getContext(), source);
+        // final GlideUrl glideUrl =
+        // FastImageViewConverter.getGlideUrl(view.getContext(), source);
         final FastImageSource imageSource = FastImageViewConverter.getImageSource(view.getContext(), source);
         final GlideUrl glideUrl = imageSource.getGlideUrl();
 
@@ -101,35 +107,23 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
         eventEmitter.receiveEvent(viewId, REACT_ON_LOAD_START_EVENT, new WritableNativeMap());
 
         if (requestManager != null) {
+            Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(),
+                    placeholder.getString("uri"));
 
-            RequestBuilder requestBuilder = requestManager
-                    .load(imageSource.getSourceForLoad())
+            RequestBuilder requestBuilder = requestManager.load(imageSource.getSourceForLoad())
+                    .apply(new RequestOptions().error(drawable).placeholder(drawable).fallback(drawable))
                     .apply(FastImageViewConverter.getOptions(source));
 
-            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(key);
+            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance()
+                    .fetchConfiguration(key);
 
             if (configuration != null) {
                 String signature = FastImageUrlSignatureGenerator.getInstance().getSignature(configuration);
 
-                requestBuilder = requestBuilder.apply(new RequestOptions()
-                        .signature(new ObjectKey(signature))
-                );
+                requestBuilder = requestBuilder.apply(new RequestOptions().signature(new ObjectKey(signature)));
             }
 
-            requestBuilder.listener(new FastImageRequestListener(key))
-                    .into(view);
-        }
-    }
-
-    @ReactProp(name = "placeholder")
-    public void setPlaceholder(FastImageViewWithUrl view, @Nullable ReadableMap placeholder) {
-        if (requestManager != null && !isNullOrEmpty(placeholder.getString("uri"))) {
-            Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(), placeholder.getString("uri"));
-
-            requestManager.load("")
-                    .apply(new RequestOptions()
-                            .placeholder(drawable).fallback(drawable).error(drawable))
-                    .into(view);
+            requestBuilder.listener(new FastImageRequestListener(key)).into(view);
         }
     }
 
@@ -152,7 +146,8 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
             List<FastImageViewWithUrl> viewsForKey = VIEWS_FOR_URLS.get(key);
             if (viewsForKey != null) {
                 viewsForKey.remove(view);
-                if (viewsForKey.size() == 0) VIEWS_FOR_URLS.remove(key);
+                if (viewsForKey.size() == 0)
+                    VIEWS_FOR_URLS.remove(key);
             }
         }
 
@@ -166,8 +161,7 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
                 .put(REACT_ON_PROGRESS_EVENT, MapBuilder.of("registrationName", REACT_ON_PROGRESS_EVENT))
                 .put(REACT_ON_LOAD_EVENT, MapBuilder.of("registrationName", REACT_ON_LOAD_EVENT))
                 .put(REACT_ON_ERROR_EVENT, MapBuilder.of("registrationName", REACT_ON_ERROR_EVENT))
-                .put(REACT_ON_LOAD_END_EVENT, MapBuilder.of("registrationName", REACT_ON_LOAD_END_EVENT))
-                .build();
+                .put(REACT_ON_LOAD_END_EVENT, MapBuilder.of("registrationName", REACT_ON_LOAD_END_EVENT)).build();
     }
 
     @Override
@@ -194,7 +188,6 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     private boolean isNullOrEmpty(final String url) {
         return url == null || url.trim().isEmpty();
     }
-
 
     private static boolean isValidContextForGlide(final Context context) {
         if (context == null) {
