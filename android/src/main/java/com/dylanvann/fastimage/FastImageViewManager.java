@@ -62,7 +62,10 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     }
 
     @ReactProp(name = "source")
-    public void setSrc(FastImageViewWithUrl view, @Nullable ReadableMap source) {
+    public void setSrc(FastImageViewWithUrl view, @Nullable ReadableMap sourcesMap) {
+        ReadableMap source = sourcesMap.getMap("source");
+        ReadableMap placeholder = sourcesMap.getMap("placeholder");
+
         if (source == null || !source.hasKey("uri") || isNullOrEmpty(source.getString("uri"))) {
             // Cancel existing requests.
             if (requestManager != null) {
@@ -118,20 +121,16 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
                 );
             }
 
+            if (!isNullOrEmpty(placeholder.getString("uri"))) {
+                Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(), placeholder.getString("uri"));
+
+                requestBuilder = requestBuilder.apply(new RequestOptions()
+                        .placeholder(drawable));
+
+            }
+
 
             requestBuilder.listener(new FastImageRequestListener(key))
-                    .into(view);
-        }
-    }
-
-    @ReactProp(name = "placeholder")
-    public void setPlaceholder(FastImageViewWithUrl view, @Nullable ReadableMap placeholder) {
-        if (requestManager != null && !isNullOrEmpty(placeholder.getString("uri"))) {
-            Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(view.getContext(), placeholder.getString("uri"));
-
-            requestManager.load("")
-                    .apply(new RequestOptions()
-                            .placeholder(drawable))
                     .into(view);
         }
     }

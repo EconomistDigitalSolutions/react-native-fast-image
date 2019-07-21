@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
     View,
     Image,
@@ -8,15 +8,15 @@ import {
     StyleSheet,
     NativeModules,
     Platform
-} from 'react-native'
-import preloaderManager from './preloaderManager'
+} from 'react-native';
+import preloaderManager from './preloaderManager';
 
 class FastImage extends Component {
     setNativeProps(nativeProps) {
-        this._root.setNativeProps(nativeProps)
+        this._root.setNativeProps(nativeProps);
     }
 
-    captureRef = e => (this._root = e)
+    captureRef = e => (this._root = e);
 
     render() {
         const {
@@ -31,17 +31,20 @@ class FastImage extends Component {
             children,
             fallback,
             ...props
-        } = this.props
+        } = this.props;
 
-        const resolvedSource = Image.resolveAssetSource(source)
-        const resolvedPlaceholder = Platform.OS === 'Android' ? placeholder : Image.resolveAssetSource(placeholder)
+        const resolvedSource =
+            Platform.OS === 'Android'
+                ? {
+                      source: Image.resolveAssetSource(source),
+                      placeholder: Image.resolveAssetSource(placeholder)
+                  }
+                : Image.resolveAssetSource(source);
+        const resolvedPlaceholder = Image.resolveAssetSource(placeholder);
 
         if (fallback) {
             return (
-                <View
-                    style={[styles.imageContainer, style]}
-                    ref={this.captureRef}
-                >
+                <View style={[styles.imageContainer, style]} ref={this.captureRef}>
                     <FastImageView
                         {...props}
                         style={StyleSheet.absoluteFill}
@@ -55,7 +58,7 @@ class FastImage extends Component {
                     />
                     {children}
                 </View>
-            )
+            );
         }
 
         return (
@@ -73,22 +76,22 @@ class FastImage extends Component {
                 />
                 {children}
             </View>
-        )
+        );
     }
 }
 
 const styles = StyleSheet.create({
     imageContainer: {
-        overflow: 'hidden',
-    },
-})
+        overflow: 'hidden'
+    }
+});
 
 FastImage.resizeMode = {
     contain: 'contain',
     cover: 'cover',
     stretch: 'stretch',
-    center: 'center',
-}
+    center: 'center'
+};
 
 FastImage.priority = {
     // lower than usual.
@@ -96,8 +99,8 @@ FastImage.priority = {
     // normal, the default.
     normal: 'normal',
     // higher than usual.
-    high: 'high',
-}
+    high: 'high'
+};
 
 FastImage.cacheControl = {
     // Ignore headers, use uri as cache key, fetch only if not in cache.
@@ -105,8 +108,8 @@ FastImage.cacheControl = {
     // Respect http headers, no aggressive caching.
     web: 'web',
     // Only load from cache.
-    cacheOnly: 'cacheOnly',
-}
+    cacheOnly: 'cacheOnly'
+};
 
 FastImage.preload = (
     sources,
@@ -114,29 +117,27 @@ FastImage.preload = (
     onProgress,
     onComplete,
     preloadConfig
-) => {
-    return preloaderManager.preload(sources, cacheControl, onProgress, onComplete, preloadConfig)
-}
+) => preloaderManager.preload(sources, cacheControl, onProgress, onComplete, preloadConfig);
 
 FastImage.cancelPreload = preloaderId => {
-    preloaderManager.cancelPreload(preloaderId)
-}
+    preloaderManager.cancelPreload(preloaderId);
+};
 
-FastImage.addReadOnlyCachePath = path => NativeModules.FastImageView.addReadOnlyCachePath(path)
+FastImage.addReadOnlyCachePath = path => NativeModules.FastImageView.addReadOnlyCachePath(path);
 
-FastImage.remove = (namespace) => preloaderManager.remove(namespace)
+FastImage.remove = namespace => preloaderManager.remove(namespace);
 
 FastImage.defaultProps = {
-    resizeMode: FastImage.resizeMode.cover,
-}
+    resizeMode: FastImage.resizeMode.cover
+};
 
 const FastImageSourcePropType = PropTypes.shape({
     uri: PropTypes.string,
     headers: PropTypes.objectOf(PropTypes.string),
     priority: PropTypes.oneOf(Object.keys(FastImage.priority)),
     cache: PropTypes.oneOf(Object.keys(FastImage.cacheControl)),
-    placeholder: PropTypes.string,
-})
+    placeholder: PropTypes.string
+});
 
 FastImage.propTypes = {
     ...ViewPropTypes,
@@ -146,8 +147,8 @@ FastImage.propTypes = {
     onLoad: PropTypes.func,
     onError: PropTypes.func,
     onLoadEnd: PropTypes.func,
-    fallback: PropTypes.bool,
-}
+    fallback: PropTypes.bool
+};
 
 const FastImageView = requireNativeComponent('FastImageView', FastImage, {
     nativeOnly: {
@@ -155,8 +156,8 @@ const FastImageView = requireNativeComponent('FastImageView', FastImage, {
         onFastImageProgress: true,
         onFastImageLoad: true,
         onFastImageError: true,
-        onFastImageLoadEnd: true,
-    },
-})
+        onFastImageLoadEnd: true
+    }
+});
 
-export default FastImage
+export default FastImage;
