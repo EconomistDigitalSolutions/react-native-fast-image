@@ -21,6 +21,7 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +36,7 @@ import javax.annotation.Nullable;
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_ERROR_EVENT;
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_LOAD_END_EVENT;
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_LOAD_EVENT;
+import static java.security.AccessController.getContext;
 
 class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> implements FastImageProgressListener {
 
@@ -124,15 +126,14 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
     }
 
     @ReactProp(name = "placeholder")
-    public void setPlaceholder(FastImageViewWithUrl view, @Nullable ReadableMap placeholder) {
+    public void setPlaceholder(FastImageViewWithUrl view, @Nullable String placeholder) {
         if (requestManager != null) {
             try {
-                final FastImageSource imageSource = FastImageViewConverter.getImageSource(view.getContext(), placeholder);
+                Drawable drawable = ResourceDrawableIdHelper.getInstance().getResourceDrawable(getContext(), placeholder);
 
                 requestManager.load("")
                         .apply(new RequestOptions()
-                                .placeholder(Drawable.createFromStream((InputStream) imageSource.getGlideUrl().toURL().getContent(), "placeholder"
-                                )))
+                                .placeholder(drawable))
                         .into(view);
             } catch (IOException e) {
                 e.printStackTrace();

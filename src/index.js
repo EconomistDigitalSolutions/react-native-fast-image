@@ -6,7 +6,8 @@ import {
     requireNativeComponent,
     ViewPropTypes,
     StyleSheet,
-    NativeModules
+    NativeModules,
+    Platform
 } from 'react-native'
 import preloaderManager from './preloaderManager'
 
@@ -33,7 +34,7 @@ class FastImage extends Component {
         } = this.props
 
         const resolvedSource = Image.resolveAssetSource(source)
-        const resolvedPlaceholder = Image.resolveAssetSource(placeholder)
+        const resolvedPlaceholder = Platform.OS === 'Android' ? placeholder : Image.resolveAssetSource(placeholder)
 
         if (fallback) {
             return (
