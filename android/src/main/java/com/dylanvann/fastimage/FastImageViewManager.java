@@ -3,10 +3,14 @@ package com.dylanvann.fastimage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -94,16 +98,23 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
         eventEmitter.receiveEvent(viewId, REACT_ON_LOAD_START_EVENT, new WritableNativeMap());
 
         if (requestManager != null) {
-            requestManager
-                    // This will make this work for remote and local images. e.g.
-                    //    - file:///
-                    //    - content://
-                    //    - res:/
-                    //    - android.resource://
-                    //    - data:image/png;base64
+
+            RequestBuilder requestBuilder = requestManager
                     .load(imageSource.getSourceForLoad())
-                    .apply(FastImageViewConverter.getOptions(source))
-                    .listener(new FastImageRequestListener(key))
+                    .apply(FastImageViewConverter.getOptions(source));
+
+            FastImagePreloaderConfiguration configuration = FastImageUrlSignatureGenerator.getInstance().fetchConfiguration(key);
+
+            if (configuration != null) {
+                String signature = FastImageUrlSignatureGenerator.getInstance().getSignature(configuration);
+
+                requestBuilder = requestBuilder.apply(new RequestOptions()
+                        .signature(new ObjectKey(signature))
+                );
+            }
+
+
+            requestBuilder.listener(new FastImageRequestListener(key))
                     .into(view);
         }
     }

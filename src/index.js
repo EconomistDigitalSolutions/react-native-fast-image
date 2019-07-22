@@ -123,6 +123,7 @@ FastImage.cancelPreload = preloaderId => {
 
 FastImage.addReadOnlyCachePath = path => NativeModules.FastImageView.addReadOnlyCachePath(path)
 
+FastImage.remove = (namespace) => preloaderManager.remove(namespace)
 
 FastImage.defaultProps = {
     resizeMode: FastImage.resizeMode.cover,
