@@ -16,7 +16,7 @@ def safeExtGet(prop, fallback) {
 
 def _reactNativeVersion = safeExtGet("reactNative", "+")
 def _compileSdkVersion = safeExtGet("compileSdkVersion", 26)
-def _glideVersion = safeExtGet("glideVersion", "4.7.1")
+def _glideVersion = safeExtGet("glideVersion", "4.8.0")
 
 android {
     compileSdkVersion _compileSdkVersion
@@ -57,9 +57,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:${_glideVersion}") {
         exclude group: "com.android.support", module: "glide"
     }
-    implementation("com.github.bumptech.glide:annotations:${_glideVersion}") {
-        exclude group: "com.android.support", module: "annotations"
-    }
+    annotationProcessor "androidx.annotation:annotation:1.1.0" 
     annotationProcessor "com.github.bumptech.glide:compiler:${_glideVersion}"
     implementation("com.github.bumptech.glide:okhttp3-integration:${_glideVersion}") {
         exclude group: "com.android.support", module: "okhttp3-integration"
