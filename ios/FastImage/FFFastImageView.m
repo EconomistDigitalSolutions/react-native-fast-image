@@ -41,8 +41,8 @@
 
 - (void)setOnFastImageLoad:(RCTDirectEventBlock)onFastImageLoad {
     _onFastImageLoad = onFastImageLoad;
-    if (selfhasCompleted) {
-        _onFastImageLoad(onLoadEvent);
+    if (self.hasCompleted) {
+        _onFastImageLoad(self.onLoadEvent);
     }
 }
 
@@ -54,7 +54,7 @@
 }
 
 - (void)setOnFastImageLoadStart:(RCTDirectEventBlock)onFastImageLoadStart {
-    if (_source && !hasSentOnLoadStart) {
+    if (_source && !self.hasSentOnLoadStart) {
         _onFastImageLoadStart = onFastImageLoadStart;
         onFastImageLoadStart(@{});
         self.hasSentOnLoadStart = YES;
@@ -84,8 +84,8 @@
 - (void)didSetProps:(NSArray<NSString *> *)changedProps {
     if ([changedProps containsObject:@"source"]) {
         
-            // Attach a observer to refresh other FFFastImageView instance sharing the same source
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(imageDidLoadObserver:) name:source.url.absoluteString object:nil];
+        // Attach a observer to refresh other FFFastImageView instance sharing the same source
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(imageDidLoadObserver:) name:_source.url.absoluteString object:nil];
 
         // Load base64 images.
         NSString* url = [_source.url absoluteString];
